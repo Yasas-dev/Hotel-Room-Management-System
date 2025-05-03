@@ -49,7 +49,7 @@ public class EditGuestServlet extends HttpServlet {
 
                     updatedLines.add(updatedLine);
                 } else {
-                    updatedLines.add(line); // leave other lines unchanged
+                    updatedLines.add(line);
                 }
             }
         }

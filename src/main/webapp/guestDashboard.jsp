@@ -14,22 +14,22 @@
 
 
 
-    <!-- Custom Styles -->
+
     <style>
         body {
-            background-color: #e1f5fe; /* Light blue background */
-            color: #333; /* Dark text color for better readability */
+            background-color: #e1f5fe;
+            color: #333;
         }
 
         .container {
-            background-color: #ffffff; /* White content area */
+            background-color: #ffffff;
             padding: 30px;
             border-radius: 8px;
             box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
         }
 
         h2 {
-            color: #0288d1; /* Light blue header */
+            color: #0288d1;
             font-weight: 600;
         }
 
