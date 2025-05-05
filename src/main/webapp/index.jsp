@@ -93,7 +93,7 @@
 <!-- Welcome Section -->
 <div class="welcome-section">
     <i class="bi bi-building"></i>
-    <h1>Welcome to the Hotel Employee Portal</h1>
+    <h1>Welcome to the Hotel Room Management System</h1>
     <p>
         Project Group 124 Hotel Room Management System. Easily manage guest registrations, room assignments, and stay records. Use the tools below to handle your daily tasks efficiently.
     </p>
