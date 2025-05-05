@@ -36,12 +36,81 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Edit Guest</title>
+    <title>Edit Guest Info</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Bootstrap CSS and Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
+    <style>
+        body {
+            background-color: #e1f5fe;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .header {
+            text-align: right;
+            padding: 15px 30px;
+            font-size: 20px;
+            background-color: #ffffff;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+
+        .header a {
+            text-decoration: none;
+            color: #0288d1;
+            font-weight: 600;
+            font-size: 22px;
+        }
+
+        .container-box {
+            max-width: 600px;
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+            margin: 60px auto;
+        }
+
+        .container-box h2 {
+            text-align: center;
+            color: #01579b;
+            margin-bottom: 30px;
+        }
+
+        .container-box i {
+            font-size: 60px;
+            color: #0288d1;
+            display: block;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .form-label {
+            font-weight: 600;
+        }
+
+        .btn-primary {
+            background-color: #0288d1;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background-color: #01579b;
+        }
+    </style>
 </head>
 <body>
-<div class="container mt-5">
+
+<div class="header">
+    <a href="index.jsp">BlueWave Hotel</a>
+</div>
+
+<div class="container-box">
+    <i class="bi bi-pencil-square"></i>
     <h2>Edit Guest Info</h2>
+
     <form action="EditGuestServlet" method="POST">
         <input type="hidden" name="roomId" value="<%= editingGuest.getRoomNumber() %>">
         <input type="hidden" name="oldCheckout" value="<%= oldCheckOut %>">
@@ -69,8 +138,9 @@
                    required>
         </div>
 
-        <button type="submit" class="btn btn-primary">Save Changes</button>
+        <button type="submit" class="btn btn-primary w-100">Save Changes</button>
     </form>
 </div>
+
 </body>
 </html>
