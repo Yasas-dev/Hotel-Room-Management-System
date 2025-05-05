@@ -2,6 +2,7 @@ package com.hotel;
 
 import entity.*;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 import java.io.*;
@@ -9,6 +10,8 @@ import java.time.LocalDate;
 
 @WebServlet("/RegisterGuestServlet")
 public class RegisterGuestServlet extends HttpServlet {
+    private static final RoomBST roomTree = new RoomBST();
+
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         try {
             String name = request.getParameter("name");
@@ -17,6 +20,21 @@ public class RegisterGuestServlet extends HttpServlet {
             LocalDate checkOut = LocalDate.parse(request.getParameter("checkout"));
             int roomNumber = Integer.parseInt(request.getParameter("roomNumber"));
             String roomType = request.getParameter("roomType");
+
+            // Validate phone number length
+            if (phone.length() != 10) {
+                request.setAttribute("errorMessage", "Phone number must have exactly 10 digits.");
+                RequestDispatcher dispatcher = request.getRequestDispatcher("registerGuest.jsp");
+                dispatcher.forward(request, response);
+                return;
+            }
+
+            if (!roomTree.isAvailable(roomNumber)) {
+                request.setAttribute("errorMessage", "Room " + roomNumber + " is already booked!");
+                RequestDispatcher dispatcher = request.getRequestDispatcher("registerGuest.jsp");
+                dispatcher.forward(request, response);
+                return;
+            }
 
             Guest guest = roomType.equalsIgnoreCase("vip") ?
                     new VipGuest(name, phone, checkIn, checkOut, roomNumber) :
@@ -29,7 +47,9 @@ public class RegisterGuestServlet extends HttpServlet {
                 writer.newLine();
             }
 
+            roomTree.bookRoom(roomNumber);
             response.sendRedirect("guestDashboard.jsp");
+
         } catch (Exception e) {
             response.setContentType("text/html");
             response.getWriter().println("<html><body><h3>Error: " + e.getMessage() + "</h3></body></html>");
