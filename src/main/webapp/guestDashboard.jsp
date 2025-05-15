@@ -8,12 +8,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Guest Dashboard</title>
 
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet">
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-
-
-
-
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 
     <style>
         body {
@@ -34,7 +30,7 @@
         }
 
         table {
-            background-color: #ffffff; /* White for the table background */
+            background-color: #ffffff;
             border-radius: 8px;
             width: 100%;
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
@@ -46,26 +42,26 @@
         }
 
         th {
-            background-color: #81d4fa; /* Soft light blue for table header */
-            color: #01579b; /* Darker blue text for contrast */
+            background-color: #81d4fa;
+            color: #01579b;
             font-size: 16px;
         }
 
         td {
-            background-color: #f1f8e9; /* Very light greenish-blue for rows */
+            background-color: #f1f8e9;
             font-size: 14px;
         }
 
         tr:nth-child(even) td {
-            background-color: #e3f2fd; /* Alternating light blue rows */
+            background-color: #e3f2fd;
         }
 
         tr:hover td {
-            background-color: #b3e5fc; /* Hover effect with a slightly darker blue */
+            background-color: #b3e5fc;
         }
 
         .btn-primary {
-            background-color: #0288d1; /* Primary blue button */
+            background-color: #0288d1;
             border-color: #0288d1;
         }
 
@@ -77,6 +73,7 @@
         .bi-pencil-square, .bi-trash {
             font-size: 18px;
             color: #0288d1;
+            margin-right: 10px;
         }
 
         .bi-pencil-square:hover, .bi-trash:hover {
@@ -102,7 +99,6 @@
         </thead>
         <tbody>
         <%
-            // Read guests from the file
             File file = new File("C:/Users/USER/Desktop/final project/HotelRoomManagementApp/src/main/webapp/Guests.txt");
             List<Guest> guests = new ArrayList<>();
 
@@ -116,9 +112,7 @@
                     LocalDate checkOut = LocalDate.parse(parts[3].trim());
                     String roomType = parts[4].trim();
                     int roomNumber = Integer.parseInt(parts[5].trim());
-                    double totalPrice = Double.parseDouble(parts[6].trim());
 
-                    // Create guest objects
                     Guest guest = roomType.equalsIgnoreCase("vip") ?
                             new VipGuest(name, phone, checkIn, checkOut, roomNumber) :
                             new NormalGuest(name, phone, checkIn, checkOut, roomNumber);
@@ -128,10 +122,8 @@
                 e.printStackTrace();
             }
 
-            // Sort guests by check-in date using QuickSort
             GuestSort.sortGuestsByCheckInDate(guests);
 
-            // Display guests
             for (Guest guest : guests) {
         %>
         <tr>
@@ -144,7 +136,8 @@
             <td><%= guest.calculatePrice() %></td>
             <td>
                 <a href="editGuest.jsp?id=<%= guest.getRoomNumber() %>" class="bi bi-pencil-square"></a>
-                <a href="deleteGuest.jsp?id=<%= guest.getRoomNumber() %>" class="bi bi-trash"></a>
+                <a href="deleteGuest?id=<%= guest.getRoomNumber() %>" class="bi bi-trash"
+                   onclick="return confirm('Are you sure you want to delete this guest?');"></a>
             </td>
         </tr>
         <%
@@ -152,6 +145,9 @@
         %>
         </tbody>
     </table>
+
+    <!-- Back to Home Button -->
+    <a href="index.jsp" class="btn btn-primary w-100 mt-4">Back to Home</a>
 </div>
 </body>
 </html>

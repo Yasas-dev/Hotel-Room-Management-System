@@ -1,6 +1,5 @@
 package entity;
 
-import java.time.Instant;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 
@@ -71,4 +70,6 @@ public abstract class Guest {
     public void setRoomNumber(int roomNumber) {
         this.roomNumber = roomNumber;
     }
+
+
 }

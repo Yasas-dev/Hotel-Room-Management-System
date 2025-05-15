@@ -117,12 +117,12 @@
 
         <div class="mb-3">
             <label class="form-label">Guest Name:</label>
-            <input type="text" class="form-control" name="name" value="<%= editingGuest.getName() %>" required>
+            <input type="text" class="form-control" name="newName" value="<%= editingGuest.getName() %>" required>
         </div>
 
         <div class="mb-3">
             <label class="form-label">Phone Number:</label>
-            <input type="text" class="form-control" name="phone" value="<%= editingGuest.getPhone() %>" required>
+            <input type="text" class="form-control" name="newPhone" value="<%= editingGuest.getPhone() %>" required>
         </div>
 
         <div class="mb-3">
@@ -132,7 +132,7 @@
 
         <div class="mb-3">
             <label class="form-label">New Checkout Date (After <%= checkIn %>):</label>
-            <input type="date" class="form-control" name="checkout"
+            <input type="date" class="form-control" name="newCheckout"
                    value="<%= oldCheckOut %>"
                    min="<%= minNewCheckout %>"
                    required>

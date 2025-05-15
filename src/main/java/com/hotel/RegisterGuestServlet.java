@@ -1,8 +1,7 @@
 package com.hotel;
 
 import entity.*;
-
-import javax.servlet.RequestDispatcher;
+import javax.servlet.*;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 import java.io.*;
@@ -10,9 +9,8 @@ import java.time.LocalDate;
 
 @WebServlet("/RegisterGuestServlet")
 public class RegisterGuestServlet extends HttpServlet {
-    private static final RoomBST roomTree = new RoomBST();
-
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
         try {
             String name = request.getParameter("name");
             String phone = request.getParameter("phone");
@@ -21,18 +19,15 @@ public class RegisterGuestServlet extends HttpServlet {
             int roomNumber = Integer.parseInt(request.getParameter("roomNumber"));
             String roomType = request.getParameter("roomType");
 
-            // Validate phone number length
             if (phone.length() != 10) {
                 request.setAttribute("errorMessage", "Phone number must have exactly 10 digits.");
-                RequestDispatcher dispatcher = request.getRequestDispatcher("registerGuest.jsp");
-                dispatcher.forward(request, response);
+                request.getRequestDispatcher("registerGuest.jsp").forward(request, response);
                 return;
             }
 
-            if (!roomTree.isAvailable(roomNumber)) {
+            if (!GuestServices.isRoomAvailable(roomNumber)) {
                 request.setAttribute("errorMessage", "Room " + roomNumber + " is already booked!");
-                RequestDispatcher dispatcher = request.getRequestDispatcher("registerGuest.jsp");
-                dispatcher.forward(request, response);
+                request.getRequestDispatcher("registerGuest.jsp").forward(request, response);
                 return;
             }
 
@@ -40,19 +35,15 @@ public class RegisterGuestServlet extends HttpServlet {
                     new VipGuest(name, phone, checkIn, checkOut, roomNumber) :
                     new NormalGuest(name, phone, checkIn, checkOut, roomNumber);
 
-            File file = new File("C:\\Users\\USER\\Desktop\\final project\\HotelRoomManagementApp\\src\\main\\webapp\\Guests.txt");
-            file.getParentFile().mkdirs();
-            try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, true))) {
-                writer.write(guest.getSummary());
-                writer.newLine();
+            if (GuestServices.registerGuest(guest)) {
+                response.sendRedirect("guestDashboard.jsp");
+            } else {
+                request.setAttribute("errorMessage", "Registration failed. Please try again.");
+                request.getRequestDispatcher("registerGuest.jsp").forward(request, response);
             }
-
-            roomTree.bookRoom(roomNumber);
-            response.sendRedirect("guestDashboard.jsp");
-
         } catch (Exception e) {
-            response.setContentType("text/html");
-            response.getWriter().println("<html><body><h3>Error: " + e.getMessage() + "</h3></body></html>");
+            request.setAttribute("errorMessage", "Error: " + e.getMessage());
+            request.getRequestDispatcher("registerGuest.jsp").forward(request, response);
         }
     }
 }
