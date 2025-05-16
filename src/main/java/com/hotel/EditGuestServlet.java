@@ -12,14 +12,12 @@ public class EditGuestServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
-            // Get parameters
             int roomId = Integer.parseInt(request.getParameter("roomId"));
             String newName = request.getParameter("newName");
             String newPhone = request.getParameter("newPhone");
             LocalDate newCheckout = LocalDate.parse(request.getParameter("newCheckout"));
             LocalDate oldCheckout = LocalDate.parse(request.getParameter("oldCheckout"));
 
-            // Simple validation
             if (newPhone.length() != 10) {
                 throw new Exception("Phone number must be 10 digits");
             }
@@ -28,7 +26,6 @@ public class EditGuestServlet extends HttpServlet {
                 throw new Exception("New checkout date cannot be before current date");
             }
 
-            // Update guest
             if (GuestServices.updateGuest(roomId, newName, newPhone, newCheckout, oldCheckout)) {
                 response.sendRedirect("guestDashboard.jsp");
             } else {

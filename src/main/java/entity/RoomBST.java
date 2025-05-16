@@ -1,9 +1,9 @@
 package entity;
 
 public class RoomBST {
-    private RoomNode root;
+    private static RoomNode root;
+    private static final Object lock = new Object();
 
-    // RoomNode definition
     private static class RoomNode {
         int roomNumber;
         boolean isAvailable;
@@ -11,22 +11,25 @@ public class RoomBST {
 
         RoomNode(int roomNumber) {
             this.roomNumber = roomNumber;
-            this.isAvailable = true; // all rooms start as available
+            this.isAvailable = true;
         }
     }
 
-    public RoomBST() {
-        // Build BST for room numbers 1 to 20
-        for (int i = 1; i <= 20; i++) {
-            insert(i);
+    static {
+        // Initialize all rooms as available
+        synchronized (lock) {
+            for (int i = 1; i <= 20; i++) {
+                insert(i);
+            }
+            System.out.println("[SYSTEM] Initialized room BST with 20 rooms");
         }
     }
 
-    private void insert(int roomNumber) {
+    private static void insert(int roomNumber) {
         root = insertRec(root, roomNumber);
     }
 
-    private RoomNode insertRec(RoomNode node, int roomNumber) {
+    private static RoomNode insertRec(RoomNode node, int roomNumber) {
         if (node == null) return new RoomNode(roomNumber);
         if (roomNumber < node.roomNumber)
             node.left = insertRec(node.left, roomNumber);
@@ -35,29 +38,30 @@ public class RoomBST {
         return node;
     }
 
-    // Mark room as unavailable (false)
-    public void bookRoom(int roomNumber) {
+    public static synchronized void bookRoom(int roomNumber) {
         RoomNode node = find(root, roomNumber);
         if (node != null) {
             node.isAvailable = false;
+            System.out.println("[SYSTEM] Booked room: " + roomNumber);
         }
     }
 
-    // Mark room as available (true)
-    public void releaseRoom(int roomNumber) {
+    public static synchronized void releaseRoom(int roomNumber) {
         RoomNode node = find(root, roomNumber);
         if (node != null) {
             node.isAvailable = true;
+            System.out.println("[SYSTEM] Released room: " + roomNumber);
         }
     }
 
-    // Check if room is available
-    public boolean isAvailable(int roomNumber) {
+    public static synchronized boolean isAvailable(int roomNumber) {
         RoomNode node = find(root, roomNumber);
-        return node != null && node.isAvailable;
+        boolean available = node != null && node.isAvailable;
+        System.out.println("[SYSTEM] Checking room " + roomNumber + " - Available: " + available);
+        return available;
     }
 
-    private RoomNode find(RoomNode node, int roomNumber) {
+    private static RoomNode find(RoomNode node, int roomNumber) {
         if (node == null) return null;
         if (roomNumber == node.roomNumber) return node;
         return roomNumber < node.roomNumber

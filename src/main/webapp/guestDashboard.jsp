@@ -100,7 +100,7 @@
         <tbody>
         <%
             File file = new File("C:/Users/USER/Desktop/final project/HotelRoomManagementApp/src/main/webapp/Guests.txt");
-            List<Guest> guests = new ArrayList<>();
+            List<Guest> guestList = new ArrayList<>();
 
             try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
                 String line;
@@ -116,14 +116,17 @@
                     Guest guest = roomType.equalsIgnoreCase("vip") ?
                             new VipGuest(name, phone, checkIn, checkOut, roomNumber) :
                             new NormalGuest(name, phone, checkIn, checkOut, roomNumber);
-                    guests.add(guest);
+                    guestList.add(guest);
                 }
             } catch (IOException e) {
                 e.printStackTrace();
             }
 
+            // Convert to array and sort
+            Guest[] guests = guestList.toArray(new Guest[0]);
             GuestSort.sortGuestsByCheckInDate(guests);
 
+            // Display sorted guests
             for (Guest guest : guests) {
         %>
         <tr>

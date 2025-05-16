@@ -11,7 +11,6 @@ public class DeleteGuestServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
-            // Get parameter - changed from roomNumber to id
             int roomNumber = Integer.parseInt(request.getParameter("id"));
 
             if (GuestServices.deleteGuest(roomNumber)) {
@@ -28,6 +27,6 @@ public class DeleteGuestServlet extends HttpServlet {
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        doGet(request, response); // Handle POST the same as GET
+        doGet(request, response);
     }
 }
