@@ -6,148 +6,115 @@ import java.util.*;
 
 public class GuestServices {
     private static final String FILE_PATH = "C:\\Users\\USER\\Desktop\\final project\\HotelRoomManagementApp\\src\\main\\webapp\\Guests.txt";
-    private static final Object fileLock = new Object();
 
     static {
-        reloadRoomStates(); // Load room states when class is initialized
-    }
-
-    private static void reloadRoomStates() {
-        synchronized (fileLock) {
-            try {
-                File file = new File(FILE_PATH);
-                if (!file.exists()) {
-                    return; // No file exists yet, nothing to load
+        // Load booked rooms from file at startup
+        try (BufferedReader reader = new BufferedReader(new FileReader(FILE_PATH))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split(",");
+                if (parts.length >= 6) {
+                    int roomNumber = Integer.parseInt(parts[5].trim());
+                    RoomBST.bookRoom(roomNumber);
                 }
-
-                try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-                    String line;
-                    while ((line = reader.readLine()) != null) {
-                        String[] parts = line.split(",");
-                        if (parts.length >= 6) {
-                            int roomNumber = Integer.parseInt(parts[5].trim());
-                            RoomBST.bookRoom(roomNumber); // Mark room as booked
-                        }
-                    }
-                    System.out.println("[SYSTEM] Successfully reloaded room states from file");
-                }
-            } catch (IOException e) {
-                System.err.println("[ERROR] Failed to reload room states: " + e.getMessage());
             }
+        } catch (IOException e) {
+            // File doesn't exist yet - that's fine
+            System.out.println("[SYSTEM] No existing guest data found - starting fresh");
         }
     }
 
     public static boolean isRoomAvailable(int roomNumber) {
-        return RoomBST.isAvailable(roomNumber);
+        return RoomBST.roomExists(roomNumber) && RoomBST.isAvailable(roomNumber);
     }
 
     public static boolean registerGuest(Guest guest) {
-        synchronized (fileLock) {
-            try {
-                File file = new File(FILE_PATH);
-                file.getParentFile().mkdirs();
+        if (!isRoomAvailable(guest.getRoomNumber())) {
+            return false;
+        }
 
-                try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, true))) {
-                    writer.write(guest.getSummary());
-                    writer.newLine();
-                }
-
-                RoomBST.bookRoom(guest.getRoomNumber());
-                return true;
-            } catch (IOException e) {
-                e.printStackTrace();
-                return false;
-            }
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_PATH, true))) {
+            writer.write(guest.getSummary());
+            writer.newLine();
+            RoomBST.bookRoom(guest.getRoomNumber());
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
         }
     }
 
     public static boolean updateGuest(int roomId, String newName, String newPhone,
                                       LocalDate newCheckout, LocalDate oldCheckout) {
-        synchronized (fileLock) {
-            List<String> updatedLines = new ArrayList<>();
-            boolean guestFound = false;
+        List<String> lines = new ArrayList<>();
+        boolean found = false;
 
-            try (BufferedReader reader = new BufferedReader(new FileReader(FILE_PATH))) {
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    String[] parts = line.split(",");
-                    int currentRoom = Integer.parseInt(parts[5].trim());
+        try (BufferedReader reader = new BufferedReader(new FileReader(FILE_PATH))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split(",");
+                if (Integer.parseInt(parts[5].trim()) == roomId) {
+                    // Update the guest record
+                    double oldPrice = Double.parseDouble(parts[6].trim());
+                    long extraDays = oldCheckout.until(newCheckout).getDays();
+                    double newPrice = oldPrice + (extraDays > 0 ? extraDays * 1000 : 0);
 
-                    if (currentRoom == roomId) {
-                        String roomType = parts[4].trim();
-                        LocalDate checkIn = LocalDate.parse(parts[2].trim());
-                        double oldPrice = Double.parseDouble(parts[6].trim());
-
-                        long extraDays = oldCheckout.until(newCheckout).getDays();
-                        double newPrice = oldPrice + (extraDays > 0 ? extraDays * 1000 : 0);
-
-                        String updatedLine = String.join(",",
-                                newName, newPhone, checkIn.toString(), newCheckout.toString(),
-                                roomType, String.valueOf(roomId), String.valueOf(newPrice));
-
-                        updatedLines.add(updatedLine);
-                        guestFound = true;
-                    } else {
-                        updatedLines.add(line);
-                    }
+                    line = String.join(",",
+                            newName, newPhone, parts[2].trim(), newCheckout.toString(),
+                            parts[4].trim(), String.valueOf(roomId), String.valueOf(newPrice));
+                    found = true;
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
-                return false;
+                lines.add(line);
             }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
 
+        if (found) {
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_PATH))) {
-                for (String updatedLine : updatedLines) {
+                for (String updatedLine : lines) {
                     writer.write(updatedLine);
                     writer.newLine();
                 }
+                return true;
             } catch (IOException e) {
                 e.printStackTrace();
-                return false;
             }
-
-            return guestFound;
         }
+        return false;
     }
 
-    public static boolean deleteGuest(int roomNumberToDelete) {
-        synchronized (fileLock) {
-            List<String> updatedGuests = new ArrayList<>();
-            boolean guestDeleted = false;
+    public static boolean deleteGuest(int roomNumber) {
+        List<String> lines = new ArrayList<>();
+        boolean found = false;
 
-            try (BufferedReader reader = new BufferedReader(new FileReader(FILE_PATH))) {
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    String[] parts = line.split(",");
-                    if (parts.length >= 6) {
-                        int roomNumber = Integer.parseInt(parts[5].trim());
-                        if (roomNumber != roomNumberToDelete) {
-                            updatedGuests.add(line);
-                        } else {
-                            guestDeleted = true;
-                        }
-                    }
+        try (BufferedReader reader = new BufferedReader(new FileReader(FILE_PATH))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                if (Integer.parseInt(line.split(",")[5].trim()) != roomNumber) {
+                    lines.add(line);
+                } else {
+                    found = true;
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
-                return false;
             }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
 
-            try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_PATH, false))) {
-                for (String guestLine : updatedGuests) {
-                    writer.write(guestLine);
+        if (found) {
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_PATH))) {
+                for (String line : lines) {
+                    writer.write(line);
                     writer.newLine();
                 }
+                RoomBST.releaseRoom(roomNumber);
+                return true;
             } catch (IOException e) {
                 e.printStackTrace();
-                return false;
             }
-
-            if (guestDeleted) {
-                RoomBST.releaseRoom(roomNumberToDelete);
-            }
-
-            return guestDeleted;
         }
+        return false;
     }
 }
