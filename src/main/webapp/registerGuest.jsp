@@ -79,7 +79,7 @@ registerGuest.jsp
                 var timeDiff = checkoutDate - checkinDate;
                 var dayDiff = timeDiff / (1000 * 3600 * 24);
 
-                roomPrice = (roomType === 'vip') ? 1000 : 500;
+                roomPrice = (roomType === 'vip') ? 2000 : 1000;
                 totalPrice = roomPrice * dayDiff;
                 document.getElementById('totalPrice').innerHTML = "Total Price: " + totalPrice + " USD";
             } else {
