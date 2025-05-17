@@ -63,8 +63,4 @@ public class RoomBST {
                 : find(node.right, roomNumber);
     }
 
-    // New method to check if a room exists (valid room number)
-    public static boolean roomExists(int roomNumber) {
-        return roomNumber >= 1 && roomNumber <= TOTAL_ROOMS;
-    }
 }
