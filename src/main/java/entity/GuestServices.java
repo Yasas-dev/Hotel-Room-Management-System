@@ -5,7 +5,7 @@ import java.time.LocalDate;
 
 public class GuestServices {
     private static final String FILE_PATH = "C:\\Users\\USER\\Desktop\\final project\\HotelRoomManagementApp\\src\\main\\webapp\\Guests.txt";
-    private static final int MAX_GUESTS = 100; // Reasonable upper limit
+    private static final int MAX_GUESTS = 20; // Reasonable upper limit
 
     static {
         loadBookedRooms();
