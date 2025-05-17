@@ -19,13 +19,12 @@ public class GuestServices {
                 }
             }
         } catch (IOException e) {
-            // File doesn't exist yet - that's fine
             System.out.println("[SYSTEM] No existing guest data found - starting fresh");
         }
     }
 
     public static boolean isRoomAvailable(int roomNumber) {
-        return RoomBST.roomExists(roomNumber) && RoomBST.isAvailable(roomNumber);
+        return RoomBST.isAvailable(roomNumber);
     }
 
     public static boolean registerGuest(Guest guest) {
@@ -54,7 +53,6 @@ public class GuestServices {
             while ((line = reader.readLine()) != null) {
                 String[] parts = line.split(",");
                 if (Integer.parseInt(parts[5].trim()) == roomId) {
-                    // Update the guest record
                     double oldPrice = Double.parseDouble(parts[6].trim());
                     long extraDays = oldCheckout.until(newCheckout).getDays();
                     double newPrice = oldPrice + (extraDays > 0 ? extraDays * 1000 : 0);
