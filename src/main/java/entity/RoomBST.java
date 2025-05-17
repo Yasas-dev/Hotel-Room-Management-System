@@ -2,7 +2,7 @@ package entity;
 
 public class RoomBST {
     private static RoomNode root;
-    private static final Object lock = new Object();
+    private static final int TOTAL_ROOMS = 20;
 
     private static class RoomNode {
         int roomNumber;
@@ -16,13 +16,11 @@ public class RoomBST {
     }
 
     static {
-        // Initialize all rooms as available
-        synchronized (lock) {
-            for (int i = 1; i <= 20; i++) {
-                insert(i);
-            }
-            System.out.println("[SYSTEM] Initialized room BST with 20 rooms");
+        // Initialize all rooms (1-20) as available
+        for (int i = 1; i <= TOTAL_ROOMS; i++) {
+            insert(i);
         }
+        System.out.println("[SYSTEM] Initialized room BST with " + TOTAL_ROOMS + " rooms");
     }
 
     private static void insert(int roomNumber) {
@@ -38,27 +36,23 @@ public class RoomBST {
         return node;
     }
 
-    public static synchronized void bookRoom(int roomNumber) {
+    public static void bookRoom(int roomNumber) {
         RoomNode node = find(root, roomNumber);
         if (node != null) {
             node.isAvailable = false;
-            System.out.println("[SYSTEM] Booked room: " + roomNumber);
         }
     }
 
-    public static synchronized void releaseRoom(int roomNumber) {
+    public static void releaseRoom(int roomNumber) {
         RoomNode node = find(root, roomNumber);
         if (node != null) {
             node.isAvailable = true;
-            System.out.println("[SYSTEM] Released room: " + roomNumber);
         }
     }
 
-    public static synchronized boolean isAvailable(int roomNumber) {
+    public static boolean isAvailable(int roomNumber) {
         RoomNode node = find(root, roomNumber);
-        boolean available = node != null && node.isAvailable;
-        System.out.println("[SYSTEM] Checking room " + roomNumber + " - Available: " + available);
-        return available;
+        return node != null && node.isAvailable;
     }
 
     private static RoomNode find(RoomNode node, int roomNumber) {
@@ -67,5 +61,10 @@ public class RoomBST {
         return roomNumber < node.roomNumber
                 ? find(node.left, roomNumber)
                 : find(node.right, roomNumber);
+    }
+
+    // New method to check if a room exists (valid room number)
+    public static boolean roomExists(int roomNumber) {
+        return roomNumber >= 1 && roomNumber <= TOTAL_ROOMS;
     }
 }
