@@ -1,4 +1,4 @@
-<%@ page import="java.io.*, java.util.*, entity.*, java.time.LocalDate" %>
+<%@ page import="java.io.*, entity.*, java.time.LocalDate" %>
 <%@ page import="util.GuestSort" %>
 <%@ page contentType="text/html; charset=UTF-8" language="java" %>
 <!DOCTYPE html>
@@ -100,11 +100,12 @@
         <tbody>
         <%
             File file = new File("C:/Users/USER/Desktop/final project/HotelRoomManagementApp/src/main/webapp/Guests.txt");
-            List<Guest> guestList = new ArrayList<>();
+            Guest[] guests = new Guest[20]; // Max 20 rooms
+            int guestCount = 0;
 
             try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
                 String line;
-                while ((line = reader.readLine()) != null) {
+                while ((line = reader.readLine()) != null && guestCount < 20) {
                     String[] parts = line.split(",");
                     String name = parts[0].trim();
                     String phone = parts[1].trim();
@@ -113,21 +114,22 @@
                     String roomType = parts[4].trim();
                     int roomNumber = Integer.parseInt(parts[5].trim());
 
-                    Guest guest = roomType.equalsIgnoreCase("vip") ?
+                    guests[guestCount++] = roomType.equalsIgnoreCase("vip") ?
                             new VipGuest(name, phone, checkIn, checkOut, roomNumber) :
                             new NormalGuest(name, phone, checkIn, checkOut, roomNumber);
-                    guestList.add(guest);
                 }
             } catch (IOException e) {
                 e.printStackTrace();
             }
 
-            // Convert to array and sort
-            Guest[] guests = guestList.toArray(new Guest[0]);
-            GuestSort.sortGuestsByCheckInDate(guests);
+            // Sort the array (only the filled portion)
+            Guest[] sortedGuests = new Guest[guestCount];
+            System.arraycopy(guests, 0, sortedGuests, 0, guestCount);
+            GuestSort.sortGuestsByCheckInDate(sortedGuests);
 
             // Display sorted guests
-            for (Guest guest : guests) {
+            for (Guest guest : sortedGuests) {
+                if (guest != null) {
         %>
         <tr>
             <td><%= guest.getName() %></td>
@@ -144,6 +146,7 @@
             </td>
         </tr>
         <%
+                }
             }
         %>
         </tbody>
