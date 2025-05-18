@@ -37,13 +37,13 @@ public class EditGuestServlet extends HttpServlet {
             }
 
             // Try to update guest
-            boolean success = GuestServices.updateGuest(roomId, newName, newPhone, newCheckout, oldCheckout);
-            if (success) {
+            if (GuestServices.updateGuest(roomId, newName, newPhone, newCheckout, oldCheckout)) {
                 response.sendRedirect("guestDashboard.jsp");
             } else {
                 request.setAttribute("errorMessage", "Failed to update guest information");
                 request.getRequestDispatcher("editGuest.jsp?id=" + roomId).forward(request, response);
             }
+
 
         } catch (Exception e) {
             request.setAttribute("errorMessage", "Something went wrong: " + e.getMessage());
