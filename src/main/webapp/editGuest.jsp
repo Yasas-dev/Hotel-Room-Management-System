@@ -99,6 +99,17 @@
         .btn-primary:hover {
             background-color: #01579b;
         }
+
+        .error-message {
+            color: #d32f2f;
+            background-color: #ffebee;
+            border: 1px solid #d32f2f;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 6px;
+            text-align: center;
+            font-weight: 500;
+        }
     </style>
 </head>
 <body>
@@ -110,6 +121,18 @@
 <div class="container-box">
     <i class="bi bi-pencil-square"></i>
     <h2>Edit Guest Info</h2>
+
+
+    <%
+        String errorMessage = (String) request.getAttribute("errorMessage");
+        if (errorMessage != null) {
+    %>
+    <div class="error-message">
+        <%= errorMessage %>
+    </div>
+    <%
+        }
+    %>
 
     <form action="EditGuestServlet" method="POST">
         <input type="hidden" name="roomId" value="<%= editingGuest.getRoomNumber() %>">

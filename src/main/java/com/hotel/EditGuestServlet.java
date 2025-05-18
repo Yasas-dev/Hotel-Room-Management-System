@@ -11,30 +11,43 @@ import java.time.LocalDate;
 public class EditGuestServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
+        int roomId = Integer.parseInt(request.getParameter("roomId"));
+        String newName = request.getParameter("newName");
+        String newPhone = request.getParameter("newPhone");
+        String newCheckoutStr = request.getParameter("newCheckout");
+        String oldCheckoutStr = request.getParameter("oldCheckout");
+
         try {
-            int roomId = Integer.parseInt(request.getParameter("roomId"));
-            String newName = request.getParameter("newName");
-            String newPhone = request.getParameter("newPhone");
-            LocalDate newCheckout = LocalDate.parse(request.getParameter("newCheckout"));
-            LocalDate oldCheckout = LocalDate.parse(request.getParameter("oldCheckout"));
+            LocalDate newCheckout = LocalDate.parse(newCheckoutStr);
+            LocalDate oldCheckout = LocalDate.parse(oldCheckoutStr);
 
+            // Validation: Phone number length
             if (newPhone.length() != 10) {
-                throw new Exception("Phone number must be 10 digits");
+                request.setAttribute("errorMessage", "Phone number must be 10 digits");
+                request.getRequestDispatcher("editGuest.jsp?id=" + roomId).forward(request, response);
+                return;
             }
 
+            // Validation: Checkout date
             if (newCheckout.isBefore(oldCheckout)) {
-                throw new Exception("New checkout date cannot be before current date");
+                request.setAttribute("errorMessage", "New checkout date cannot be before the current date");
+                request.getRequestDispatcher("editGuest.jsp?id=" + roomId).forward(request, response);
+                return;
             }
 
-            if (GuestServices.updateGuest(roomId, newName, newPhone, newCheckout, oldCheckout)) {
+            // Try to update guest
+            boolean success = GuestServices.updateGuest(roomId, newName, newPhone, newCheckout, oldCheckout);
+            if (success) {
                 response.sendRedirect("guestDashboard.jsp");
             } else {
-                throw new Exception("Failed to update guest information");
+                request.setAttribute("errorMessage", "Failed to update guest information");
+                request.getRequestDispatcher("editGuest.jsp?id=" + roomId).forward(request, response);
             }
+
         } catch (Exception e) {
-            request.setAttribute("errorMessage", e.getMessage());
-            request.getRequestDispatcher("editGuest.jsp?id=" + request.getParameter("roomId"))
-                    .forward(request, response);
+            request.setAttribute("errorMessage", "Something went wrong: " + e.getMessage());
+            request.getRequestDispatcher("editGuest.jsp?id=" + roomId).forward(request, response);
         }
     }
 }
