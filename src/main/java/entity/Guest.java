@@ -18,7 +18,7 @@ public abstract class Guest {
         this.roomNumber = roomNumber;
     }
 
-    public long getStayDuration() {
+    protected long getStayDuration() {
         return ChronoUnit.DAYS.between(checkIn, checkOut);
     }
 
